@@ -2,8 +2,8 @@
 let task: string = "Описание задачи";
 let completedTaskCount: number = 0;
 
-function showTask(inputTask: string) {
-  if (typeof inputTask === "string" && inputTask.trim() !== "") {
+function showTask(inputTask: string): void {
+  if (inputTask.trim() !== "") {
     console.log(inputTask);
   } else {
     console.log("Задача отсутствует");
@@ -11,12 +11,12 @@ function showTask(inputTask: string) {
 }
 
 function setTask(taskDescription: string): void {
-  if (typeof taskDescription !== "string" || taskDescription.trim() === "") {
+  if (taskDescription.trim() === "") {
     console.log("Невозможно добавить пустую задачу");
     return;
   }
 
-  if (typeof task === "string" && task.trim() !== "") {
+  if (task.trim() !== "") {
     const userChoice = prompt(
       "Не могу добавить задачу, завершите или удалите предыдущую. Введите 'удалить' или 'завершить':"
     );
@@ -36,7 +36,7 @@ function setTask(taskDescription: string): void {
 }
 
 function completeTask(): void {
-  if (typeof task !== "string" || task.trim() === "") {
+  if (task.trim() === "") {
     console.log("Нет активной задачи для завершения.");
     return;
   }
@@ -48,7 +48,7 @@ function completeTask(): void {
 }
 
 function deleteTask(): void {
-  if (typeof task !== "string" || task.trim() === "") {
+  if (task.trim() === "") {
     console.log("Нет задачи для удаления.");
     return;
   }
