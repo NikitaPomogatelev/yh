@@ -1,59 +1,123 @@
-// "use strict";
+const usedIds = new Set();
 
-// let task = "описание задачи";
-// let completedTaskCount = 0;
+// Генерация id
+function generateUniqueId() {
+  let id;
 
-// function showTask(inputTask) {
-//   if (typeof inputTask === "string" && inputTask.trim() !== "") {
-//     console.log(inputTask);
-//   } else {
-//     console.log("Задача отсутствует");
-//   }
-// }
+  do {
+    id = Math.floor(Math.random() * 101);
+  } while (usedIds.has(id));
 
-// function setTask(taskDescription) {
-//   if (typeof taskDescription !== "string" || taskDescription.trim() === "") {
-//     console.log("Невозможно добавить пустую задачу");
-//     return;
-//   }
+  usedIds.add(id);
+  return id;
+}
 
-//   if (typeof task === "string" && task.trim() !== "") {
-//     const userChoice = prompt(
-//       "Не могу добавить задачу, завершите или удалите предыдущую. Введите 'удалить' или 'завершить':"
-//     );
+// Задачи
+let tasks = [];
+const completedTasks = [];
+let completedTaskCount = 0;
 
-//     if (userChoice?.toLowerCase() === "удалить") {
-//       deleteTask();
-//     } else if (userChoice?.toLowerCase() === "завершить") {
-//       completeTask();
-//     } else {
-//       console.log("Задача не добавлена. Введите другую команду.");
-//       return;
-//     }
-//   }
+function setTask(title, description) {
+  const newTask = {
+    id: generateUniqueId(),
+    title,
+    description,
+    isCompleted: false,
+    createdDate: new Date(),
+    completedDate: null,
+  };
 
-//   task = taskDescription.trim();
-//   console.log(`Задача добавлена: ${task}`);
-// }
+  tasks.push(newTask);
 
-// function completeTask() {
-//   if (typeof task !== "string" || task.trim() === "") {
-//     console.log("Нет активной задачи для завершения.");
-//     return;
-//   }
+  console.log(`Задача #${newTask.id}: "${title} - ${description}" добавлена.`);
+}
 
-//   console.log(`Задача "${task}" завершена.`);
-//   task = "";
-//   completedTaskCount++;
-//   console.log(`Завершено задач: ${completedTaskCount}`);
-// }
+function showTasks() {
+  if (tasks.length === 0) {
+    console.log("Список задач пуст");
+    return;
+  }
 
-// function deleteTask() {
-//   if (typeof task !== "string" || task.trim() === "") {
-//     console.log("Нет задачи для удаления.");
-//     return;
-//   }
+  for (let task of tasks) {
+    console.log(task);
+  }
 
-//   console.log(`Задача "${task}" удалена.`);
-//   task = "";
-// }
+  // tasks.forEach((task) => {
+  //   console.log(task);
+  // });
+}
+
+function completeTask(idTask) {
+  const index = tasks.findIndex((t) => t.id === idTask);
+  if (index === -1) {
+    console.log("Задача не найдена");
+    return;
+  }
+
+  const currentTask = tasks[index];
+  console.log(currentTask);
+
+  currentTask.isCompleted = true;
+  currentTask.completedDate = new Date();
+
+  completedTasks.push(currentTask);
+  completedTaskCount++;
+
+  tasks.splice(index, 1);
+
+  const { id, title, description } = currentTask;
+
+  console.log(`Задача #${id}: "${title} - ${description}" выполнена`);
+}
+
+function deleteTask(idTask) {
+  const currentTaskIdx = tasks.findIndex((task) => task.id === idTask);
+
+  if (currentTaskIdx === -1) {
+    console.log("Задача не найдена");
+    return;
+  }
+
+  const currentTask = tasks[currentTaskIdx];
+  console.log(currentTask);
+
+  if (!currentTask.isCompleted) {
+    const answer = confirm("Таска еще не выполнена, удалить?");
+    if (!answer) {
+      console.log("Удаление отменено");
+      return;
+    }
+  }
+
+  tasks.splice(currentTaskIdx, 1);
+
+  const { id, title, description } = currentTask;
+  console.log(`Задача удалена: #${id}: ${title} - ${description}`);
+}
+
+function clearTasks() {
+  tasks.length = 0;
+  console.log("Все задачи очищены");
+}
+
+setTask("Подготовиться к собесам", "JS: поучить теорию, порешать задачки");
+setTask("Погулять", "Пройтись, проветриться, подышать свежим воздухом");
+setTask("Приготовить обед", "Сварить макароны, пожарить мясо");
+setTask("Увидеться с другом", "Позвонить и назначить встречу");
+
+showTasks();
+
+if (tasks.length > 0) {
+  const secondTaskId = tasks[1].id;
+  deleteTask(secondTaskId);
+}
+if (tasks.length > 0) {
+  const secondTaskId = tasks[0].id;
+  completeTask(secondTaskId);
+}
+
+showTasks();
+
+clearTasks();
+
+showTasks();
