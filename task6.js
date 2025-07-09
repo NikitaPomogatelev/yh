@@ -39,7 +39,6 @@ function deepCopy(obj, seen = new WeakMap()) {
   return copy;
 }
 
-// Твой объект с символом и циклической ссылкой
 const secretKey = Symbol("secret");
 
 const original = {
