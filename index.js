@@ -31,12 +31,12 @@ function showTasks() {
     return;
   }
 
-  for (let task of tasks) {
+  tasks.forEach((task) => {
     console.log(task);
-  }
+  });
 }
 
-function findTaskToIdx(idTask) {
+function findTaskIndexById(idTask) {
   const currentTaskIdx = tasks.findIndex((t) => t.id === idTask);
   if (currentTaskIdx === -1) {
     console.log("Задача не найдена");
@@ -45,8 +45,12 @@ function findTaskToIdx(idTask) {
   return currentTaskIdx;
 }
 
+function findTaskById(id) {
+  return tasks.find((t) => t.id === id) || null;
+}
+
 function completeTask(idTask) {
-  const currentTaskIdx = findTaskToIdx(idTask);
+  const currentTaskIdx = findTaskIndexById(idTask);
   if (currentTaskIdx === null) return;
 
   const currentTask = tasks[currentTaskIdx];
@@ -66,7 +70,7 @@ function completeTask(idTask) {
 }
 
 function deleteTask(idTask) {
-  const currentTaskIdx = findTaskToIdx(idTask);
+  const currentTaskIdx = findTaskIndexById(idTask);
   if (currentTaskIdx === null) return;
 
   const currentTask = tasks[currentTaskIdx];
@@ -90,19 +94,99 @@ function clearTasks() {
   console.log("Все задачи очищены");
 }
 
+// 1.
+function getTaskDescription() {
+  return tasks.map((t) => t.description);
+}
+
+// 2.
+function getLongTasks() {
+  return tasks.filter((t) => t.title.length > 10);
+}
+
+// 3.
+const taskMap = {
+  completed: {
+    tasks: completedTasks,
+    dateKey: "completedDate",
+  },
+  active: {
+    tasks: tasks,
+    dateKey: "createdDate",
+  },
+};
+
+function parseDate(date) {
+  return date instanceof Date ? date : new Date(date);
+}
+
+const hasDateInRange = (date, start, end) => {
+  return date >= start && date <= end;
+};
+
+function getTasksByDateRange(startDate, endDate, isCompleted = false) {
+  const startDateFormatted = parseDate(startDate);
+  const endDateFormatted = parseDate(endDate);
+
+  const status = isCompleted ? "completed" : "active";
+  const { tasks: targetTasks, dateKey } = taskMap[status];
+
+  return targetTasks.filter((task) =>
+    task[dateKey] && hasDateInRange(task[dateKey], startDateFormatted, endDateFormatted)
+  );
+
+  // if (isCompleted) {
+  //   return completedTasks.filter((t) =>
+  //     hasDateInRange(t[dateKey], startDateFormatted, endDateFormatted)
+  //   );
+  // } else {
+  //   return tasks.filter((t) =>
+  //     hasDateInRange(t[dateKey], startDateFormatted, endDateFormatted)
+  //   );
+  // }
+}
+
+// 4.
+function clearShortTasks() {
+  const initialLength = tasks.length;
+  tasks = tasks.filter((task) => task.title.length >= 5);
+
+  const removedCount = initialLength - tasks.length;
+  console.log(`Удалено задач с длиной title меньше 5: ${removedCount}`);
+}
+
+// 5
+function updateTitleTask(idTask, newTitle) {
+  const currentTask = findTaskById(idTask);
+  if (currentTask === null) return;
+
+  currentTask.title = newTitle;
+
+  const { id, title } = currentTask;
+
+  console.log(`#${id} Заголовок изменён на: ${title}`);
+}
+
 addTask("Подготовиться к собесам", "JS: поучить теорию, порешать задачки");
 addTask("Погулять", "Пройтись, проветриться, подышать свежим воздухом");
 addTask("Приготовить обед", "Сварить макароны, пожарить мясо");
+addTask("лол", "Проверить на удаление");
 addTask("Увидеться с другом", "Позвонить и назначить встречу");
 
-showTasks();
+console.log(getTaskDescription());
+console.log(getLongTasks());
 
-deleteTask(1);
+clearShortTasks();
+
+updateTitleTask(2, "Погулять в парке");
 
 completeTask(2);
 
 showTasks();
 
-clearTasks();
+console.log("Все задачи с 2025-07-01 по 2025-07-31:");
 
-showTasks();
+console.log({
+  uncompleted: getTasksByDateRange("2025-07-01", "2025-07-31"),
+  completed: getTasksByDateRange("2025-07-01", "2025-07-31", true),
+});
